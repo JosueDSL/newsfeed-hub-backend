@@ -92,8 +92,8 @@ class ErrorHandler:
                 app.logger.error('ZeroDivisionError: %s', e, exc_info=True)
                 return ErrorHandler.make_error_response(str(e), 400)
             except NoAuthorizationError as e:
-                app.logger.error('NoAuthorizationError: %s', e)
-                return ErrorHandler.make_error_response(str(e), 401)
+                app.logger.error('NoAuthorizationError: %s Authorization required. Please log in first.' , e)
+                return ErrorHandler.make_error_response(str('Authorization required. Please log in first.'), 401)
             except Exception as e:
                 app.logger.error('An error occurred: %s', e, exc_info=True)
                 return ErrorHandler.make_error_response(str(e), 500)
