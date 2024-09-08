@@ -23,7 +23,8 @@ class Config:
     JWT_COOKIE_SECURE = False
     SESSION_COOKIE_HTTPONLY = False
     JWT_COOKIE_HTTPONLY = False
-    
+    JWT_CSRF_METHODS = ['GET', 'POST', 'PUT', 'PATCH', 'DELETE']
+
     # Print config
     def __repr__(self) -> str:
         return f"Config({self.__dict__})"

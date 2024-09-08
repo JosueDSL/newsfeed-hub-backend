@@ -1,5 +1,11 @@
 # Import flask and the necessary dependencies
-from flask import Blueprint
+from flask import Blueprint, request
+
+# Import the required libraries
+from application.blueprints.helper_methods import ErrorHandler
+from application.services import UserService
+
+
 
 # Create a blueprint object
 user_bp = Blueprint('user', __name__)
@@ -9,3 +15,5 @@ user_bp = Blueprint('user', __name__)
 @user_bp.route('/health', methods=['GET'])
 def health():
     return 'OK', 200
+
+

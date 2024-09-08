@@ -48,9 +48,7 @@ def create_app():
     init_db(app)
     with app.app_context():
         create_tables(app)
-    
-    # Import models for db configuration
-    from application.models import User
+
 
     # Initialize objects of the extensions
     jwt.init_app(app)

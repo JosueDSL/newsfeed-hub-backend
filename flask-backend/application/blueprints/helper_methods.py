@@ -1,9 +1,9 @@
 # Description: Helper methods for handling exceptions and creating error responses.
 
 # Import the necessary libraries
-from flask import make_response, jsonify, current_app as app
-
-
+from flask import make_response, request, jsonify, current_app as app
+from werkzeug.exceptions import HTTPException
+from flask_jwt_extended.exceptions import NoAuthorizationError
 
 class ErrorHandler:
     """
@@ -11,7 +11,7 @@ class ErrorHandler:
     """
 
     @staticmethod
-    def make_error_response(error_message, status_code=400):
+    def make_error_response(message, status_code=400):
         """
         Create an error JSON response with a given error message and status code.
 
@@ -22,14 +22,14 @@ class ErrorHandler:
         Returns:
             Response: A Flask response object with the error message and status code.
         """
-        response = make_response(jsonify({'error': {'message': error_message}}), status_code)
-        return response
-
-
+        response = jsonify({'error': message})
+        response.status_code = status_code
+        return make_response(response, status_code)
+    
     @staticmethod
     def handle_general_exception(e):
         """
-        Handle exceptions raised during a request.
+        Handle exceptions raised during a request, including HTTP errors.
 
         Args:
             e (Exception): The exception that was raised.
@@ -37,12 +37,22 @@ class ErrorHandler:
         Returns:
             Response: A Flask response object with the error message and a 500 status code.
         """
-        app.logger.error(str(e), exc_info=True)
-        response = {
-            "error": str(e),
-            "message": "An error occurred."
-        }
-        return jsonify(response), 500
+
+        # If the exception is an HTTPException, use its code and description
+        if isinstance(e, HTTPException):
+            response = {
+                'error': e.name,
+                'message': e.description
+            }
+            return jsonify(response), e.code
+        else:
+            # For non-HTTP exceptions, return a generic 500 error
+            app.logger.error(str(e), exc_info=True)
+            response = {
+                "error": str(e),
+                "message": "An error occurred."
+            }
+            return jsonify(response), 500
 
 
     @staticmethod
@@ -57,29 +67,54 @@ class ErrorHandler:
             Any: The result of the function if no errors are raised.
             Response: A Flask response object with the error message and status code if an error is raised.
         """
+        def wrapper(*args, **kwargs):
+            try:
+                return func(*args, **kwargs)
+            except ValueError as e:
+                app.logger.error('ValueError: %s', e, exc_info=True)
+                return ErrorHandler.make_error_response(str(e), 400)
+            except TypeError as e:
+                app.logger.error('TypeError: %s', e, exc_info=True)
+                return ErrorHandler.make_error_response(str(e), 400)
+            except AttributeError as e:
+                app.logger.error('AttributeError: %s', e, exc_info=True)
+                return ErrorHandler.make_error_response(str(e), 400)
+            except KeyError as e:
+                app.logger.error('KeyError: %s', e, exc_info=True)
+                return ErrorHandler.make_error_response(str(e), 400)
+            except IOError as e:
+                app.logger.error('IOError: %s', e, exc_info=True)
+                return ErrorHandler.make_error_response(str(e), 400)
+            except RuntimeError as e:
+                app.logger.error('RuntimeError: %s', e, exc_info=True)
+                return ErrorHandler.make_error_response(str(e), 400)
+            except ZeroDivisionError as e:
+                app.logger.error('ZeroDivisionError: %s', e, exc_info=True)
+                return ErrorHandler.make_error_response(str(e), 400)
+            except NoAuthorizationError as e:
+                app.logger.error('NoAuthorizationError: %s', e)
+                return ErrorHandler.make_error_response(str(e), 401)
+            except Exception as e:
+                app.logger.error('An error occurred: %s', e, exc_info=True)
+                return ErrorHandler.make_error_response(str(e), 500)
+        return wrapper
+        
+
+    @staticmethod
+    def get_json_payload() -> dict:
+        """
+        Extracts the JSON payload from the request safely.
+
+        Returns:
+            dict: The JSON payload if valid.
+            Response: A 400 response if the JSON is invalid.
+        """
         try:
-            return func()
-        except ValueError as e:
-            app.logger.error('ValueError: %s', e, exc_info=True)
-            return ErrorHandler.make_error_response(str(e), 400)
-        except TypeError as e:
-            app.logger.error('TypeError: %s', e, exc_info=True)
-            return ErrorHandler.make_error_response(str(e), 400)
-        except AttributeError as e:
-            app.logger.error('AttributeError: %s', e, exc_info=True)
-            return ErrorHandler.make_error_response(str(e), 400)
-        except KeyError as e:
-            app.logger.error('KeyError: %s', e, exc_info=True)
-            return ErrorHandler.make_error_response(str(e), 400)
-        except IOError as e:
-            app.logger.error('IOError: %s', e, exc_info=True)
-            return ErrorHandler.make_error_response(str(e), 400)
-        except RuntimeError as e:
-            app.logger.error('RuntimeError: %s', e, exc_info=True)
-            return ErrorHandler.make_error_response(str(e), 400)
-        except ZeroDivisionError as e:
-            app.logger.error('ZeroDivisionError: %s', e, exc_info=True)
-            return ErrorHandler.make_error_response(str(e), 400)
+            payload = request.get_json()
+            if payload is None:
+                raise ValueError("No JSON payload found")
+            return payload
+
         except Exception as e:
-            app.logger.error('An error occurred: %s', e, exc_info=True)
-            return ErrorHandler.make_error_response(str(e), 500)
+            return make_response("Invalid or broken JSON request", 400)
+

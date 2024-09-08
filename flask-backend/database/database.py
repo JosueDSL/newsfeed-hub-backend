@@ -4,6 +4,7 @@
 from flask_sqlalchemy import SQLAlchemy
 from flask import current_app
 from flask_migrate import Migrate
+from sqlalchemy.exc import OperationalError
 
 # Initialize the SQLAlchemy object
 db = SQLAlchemy()
@@ -19,5 +20,14 @@ def init_db(app=None):
 
 # Create all tables if they don't exist
 def create_tables(app):
-    with app.app_context():
-        db.create_all()
+    # Create tables
+    try:
+        with app.app_context():
+            db.create_all()
+    except OperationalError as e:
+        app.logger.error("An error occurred: %s", str(e))
+        app.logger.error("Please verify your configuration settings:")
+        app.logger.error("For Docker development, use: app.config.from_object('DevelopmentDockerConfig')")
+        app.logger.error("For local development, use: app.config.from_object('DevelopmentConfig')")
+        app.logger.error("Ensure the database path is correctly set in the .env file.")
+        exit(1)
