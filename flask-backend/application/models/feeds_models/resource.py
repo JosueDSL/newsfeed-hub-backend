@@ -29,7 +29,7 @@ class Resource(db.Model):
     languages = db.Column(db.String(255))
 
     # Relationship to Feed
-    feed = db.relationship('Feed', backref='resources', lazy=True)
+    feed = db.relationship('Feed', back_populates='resources', lazy=True)
 
     # Method to serialize the object data
     def serialize(self):

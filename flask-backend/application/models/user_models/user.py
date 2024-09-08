@@ -24,6 +24,8 @@ class User(db.Model, UserMixin):
     password_hash = db.Column(db.String(255), nullable=False)
     last_login = db.Column(db.DateTime)
 
+    # Define cascade delete from User to Feeds
+    feeds = db.relationship('Feed', backref='user', lazy=True, cascade="all, delete-orphan")
 
     # Set the password attribute to be write-only
     @property
