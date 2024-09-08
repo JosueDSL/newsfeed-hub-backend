@@ -13,13 +13,18 @@ from flask import Flask
 from database import init_db, create_tables
 
 # Import the extensions for the app
-from application.extensions import jwt
+from application.extensions import jwt, migrate
 
 # Import the CORS module
 from flask_cors import CORS
 
 # Import logging
 import logging
+
+# Import the models to create the tables
+from application.models import User, Feed, Topic, Resource
+
+
 
 def create_app():
 
@@ -39,15 +44,21 @@ def create_app():
     """
 
     # Load the configuration from the config.py file
-    app.config.from_object(DevelopmentDockerConfig)
-    
+    app.config.from_object(DevelopmentConfig)
     # print(app.config)
 
+    # Initialize extensions
 
     # Initialize the database with the newly created app
     init_db(app)
     with app.app_context():
         create_tables(app)
+
+    # Initialize the migration extension
+    # Import the db object from the application module
+    from database import db
+
+    migrate.init_app(app, db)
 
 
     # Initialize objects of the extensions
