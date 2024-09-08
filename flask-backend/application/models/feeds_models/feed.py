@@ -28,8 +28,8 @@ class Feed(db.Model):
     updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
 
     # Relationship to Topics and Resources
-    topics = db.relationship('Topic', backref='feed', lazy=True)
-    resources = db.relationship('Resource', backref='feed', lazy=True)
+    topics = db.relationship('Topic', back_populates='feed', lazy=True, cascade="all, delete-orphan")
+    resources = db.relationship('Resource', back_populates='feed', lazy=True, cascade="all, delete-orphan")
 
 
     # Method to serialize the object data
