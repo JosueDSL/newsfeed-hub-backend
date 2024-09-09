@@ -1,15 +1,15 @@
 # Description: Service layer for the topics resource.
 
 # Import the necessary modules
-from application import db
+from database import db
 from application.models import Topic, Feed
 
 
 class TopicService:
     @staticmethod
-    def add_topic(topic: str, feed_id: int) -> Topic:
+    def insert_feed_topic(topic: str, feed_id: int) -> Topic:
         """
-        Add topics to the names array.
+        Insert a new topic into the database.
 
         Args:
             topic (str): The topic to add.
@@ -32,11 +32,8 @@ class TopicService:
         # Create the topic object
         new_topic = Topic(name=topic, feed_id=feed_id)
 
-        # Add the topic to the database and flush the session
+        # Add the topic to the database
         db.session.add(new_topic)
-
-        # Commit all the updates to the session database
-        db.session.commit()
 
         return new_topic
 

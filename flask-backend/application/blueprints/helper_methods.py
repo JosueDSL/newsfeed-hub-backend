@@ -4,6 +4,8 @@
 from flask import make_response, request, jsonify, current_app as app
 from werkzeug.exceptions import HTTPException
 from flask_jwt_extended.exceptions import NoAuthorizationError
+import httpx
+
 
 class ErrorHandler:
     """
@@ -82,6 +84,9 @@ class ErrorHandler:
             except KeyError as e:
                 app.logger.error('KeyError: %s', e, exc_info=True)
                 return ErrorHandler.make_error_response(str(e), 400)
+            except HTTPError as e:
+                app.logger.error('HTTPError: %s', e, exc_info=True)
+                return ErrorHandler.make_error_response(str(e), e.response.status)
             except IOError as e:
                 app.logger.error('IOError: %s', e, exc_info=True)
                 return ErrorHandler.make_error_response(str(e), 400)
@@ -118,3 +123,12 @@ class ErrorHandler:
         except Exception as e:
             return make_response("Invalid or broken JSON request", 400)
 
+
+# Custom errors for the application
+
+class HTTPError(httpx.HTTPStatusError):
+    """
+    Custom error class to handle HTTP errors.
+    """
+
+    pass
