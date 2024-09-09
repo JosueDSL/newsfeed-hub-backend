@@ -20,10 +20,13 @@ app.http('get-new-data', {
             // Log the response data
             context.log(`API response for topic "${topic}":`, response.data);
 
-            // Return the API response data as the function output
+            // Return the API response data as JSON
             return {
                 status: 200,
-                body: response.data
+                body: JSON.stringify(response.data), 
+                headers: {
+                    'Content-Type': 'application/json'
+                }
             };
 
         } catch (error) {
@@ -31,7 +34,10 @@ app.http('get-new-data', {
             context.log.error('Error fetching data:', error.message);
             return {
                 status: 500,
-                body: 'Error fetching news data. Please try again later.'
+                body: JSON.stringify({ error: 'Error fetching news data. Please try again later.' }),
+                headers: {
+                    'Content-Type': 'application/json'
+                }
             };
         }
     }
