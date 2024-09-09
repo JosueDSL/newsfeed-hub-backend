@@ -69,11 +69,12 @@ def create_app():
 
 
     # Import the blueprints
-    from .blueprints import auth_bp, user_bp
+    from .blueprints import auth_bp, user_bp, feeds_bp
 
     # Register the blueprints with url prefixes
     app.register_blueprint(auth_bp, url_prefix='/auth')
     app.register_blueprint(user_bp, url_prefix='/user')
+    app.register_blueprint(feeds_bp, url_prefix='/feeds')
 
 
 
