@@ -1,4 +1,4 @@
-from .topics_service import TopicsService
+from .topics_service import TopicService
 from .feeds_service import FeedsService
 from .resources_service import ResourcesService
-# from .azure_function_service import AzureFunctionService
+from .feed_data_handler import FeedDataHandler

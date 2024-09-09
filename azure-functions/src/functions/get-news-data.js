@@ -1,7 +1,7 @@
 const { app } = require('@azure/functions');
 const axios = require('axios');
 
-app.http('get-new-data', {
+app.http('get-news-data', {
     methods: ['POST'],
     authLevel: 'anonymous',
     handler: async (request, context) => {
