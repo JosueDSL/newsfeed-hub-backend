@@ -65,8 +65,8 @@ jobs:
         uses: azure/login@v2
         with:
           client-id: ${{ secrets.AZURE_CLIENT_ID }}
-          tenant-id: ${{ secrets.AZURE_CLIENT_ID }}
-          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION }}
+          tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
 
       - name: 'Run Azure Functions Action'
         uses: Azure/functions-action@v1
@@ -75,4 +75,3 @@ jobs:
           app-name: 'newsfeed-functions'
           slot-name: 'Production'
           package: ${{ env.AZURE_FUNCTIONAPP_PACKAGE_PATH }}
-          
