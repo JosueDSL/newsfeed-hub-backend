@@ -36,6 +36,8 @@ class Topic(db.Model):
     # Relationship to Resources
     feed = db.relationship('Feed', back_populates='topics', lazy=True)
 
+    # Relationship to Resource model
+    resource = db.relationship('Resource', back_populates='topic', lazy=True, cascade="all, delete-orphan")
 
     # Method to serialize the object data
     def serialize(self):

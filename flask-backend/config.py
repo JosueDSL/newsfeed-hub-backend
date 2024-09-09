@@ -24,6 +24,7 @@ class Config:
     SESSION_COOKIE_HTTPONLY = False
     JWT_COOKIE_HTTPONLY = False
     JWT_CSRF_METHODS = ['GET', 'POST', 'PUT', 'PATCH', 'DELETE']
+    AZURE_FUNCTION_URL = os.environ.get('AZURE_FUNCTION_URL', 'http://localhost:7071/api/get-news-data?')
 
     # Print config
     def __repr__(self) -> str:
@@ -39,7 +40,7 @@ class BaseDevelopmentConfig(Config):
     BASE_DIR = os.path.abspath(os.path.dirname(__file__))
 
     # Enable SQLALCHEMY_ECHO to print SQL queries
-    SQLALCHEMY_ECHO = True
+    # SQLALCHEMY_ECHO = True
 
 
 # Configuration for the development environment

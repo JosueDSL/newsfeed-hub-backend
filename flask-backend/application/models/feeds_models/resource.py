@@ -21,15 +21,16 @@ class Resource(db.Model):
     __tablename__ = 'resources'
 
     id = db.Column(db.Integer, primary_key=True)
-    feed_id = db.Column(db.Integer, db.ForeignKey('feeds.id'), nullable=False)
+    topic_id = db.Column(db.Integer, db.ForeignKey('topics.id'), nullable=False)
     title = db.Column(db.String(255), nullable=False)
     date = db.Column(db.String(255), nullable=False)
     type = db.Column(db.String(100))
     editorial = db.Column(db.String(255))
     languages = db.Column(db.String(255))
 
-    # Relationship to Feed
-    feed = db.relationship('Feed', back_populates='resources', lazy=True)
+    # Relationship to Topic model
+    topic = db.relationship('Topic', back_populates='resource', lazy=True)
+
 
     # Method to serialize the object data
     def serialize(self):
@@ -41,7 +42,7 @@ class Resource(db.Model):
         """
         return {
             'id': self.id,
-            'feed_id': self.feed_id,
+            'topic_id': self.topic_id,
             'title': self.title,
             'date': self.date,
             'type': self.type,
