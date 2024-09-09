@@ -1,26 +1,16 @@
 {
-    "data": {
-        "name": "get-new-data",
-        "entryPoint": "",
-        "scriptFile": "get-new-data.js",
-        "language": "node",
-        "functionDirectory": "/home/site/wwwroot/src/functions",
-        "bindings": [
-            {
-                "methods": [
-                    "GET",
-                    "POST"
-                ],
-                "authLevel": "anonymous",
-                "type": "httpTrigger",
-                "name": "httpTrigger624a61988c",
-                "direction": "in"
-            },
-            {
-                "type": "http",
-                "name": "$return",
-                "direction": "out"
-            }
-        ]
-    }
+    "bindings": [
+        {
+            "authLevel": "anonymous",
+            "type": "httpTrigger",
+            "direction": "in",
+            "name": "req",
+            "methods": ["get", "post"]
+        },
+        {
+            "type": "http",
+            "direction": "out",
+            "name": "res"
+        }
+    ]
 }
