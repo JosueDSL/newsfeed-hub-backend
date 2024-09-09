@@ -17,3 +17,17 @@ def health():
     return 'OK', 200
 
 
+# User registration route
+@user_bp.route('/register', methods=['POST'], endpoint='user_register')
+@ErrorHandler.handle_exceptions
+def register_user_endpoint():
+    # Get the payload from the request
+    payload = ErrorHandler.get_json_payload()
+
+    # Create a new user service object
+    user_service = UserService(payload)
+
+    # Register the user
+    response = user_service.register_user()
+
+    return response

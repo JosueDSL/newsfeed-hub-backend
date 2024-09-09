@@ -29,7 +29,6 @@ class Feed(db.Model):
 
     # Relationship to Topics and Resources
     topics = db.relationship('Topic', back_populates='feed', lazy=True, cascade="all, delete-orphan")
-    resources = db.relationship('Resource', back_populates='feed', lazy=True, cascade="all, delete-orphan")
 
 
     # Method to serialize the object data
