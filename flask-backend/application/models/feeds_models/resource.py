@@ -42,7 +42,7 @@ class Resource(db.Model):
         """
         return {
             'id': self.id,
-            'feed_id': self.feed_id,
+            'topic_id': self.topic_id,
             'title': self.title,
             'date': self.date,
             'type': self.type,
