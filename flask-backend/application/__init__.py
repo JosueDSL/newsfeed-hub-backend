@@ -44,7 +44,7 @@ def create_app():
     """
 
     # Load the configuration from the config.py file
-    app.config.from_object(DevelopmentConfig)
+    app.config.from_object(DevelopmentDockerConfig)
     # print(app.config)
 
     # Initialize extensions
@@ -78,11 +78,12 @@ def create_app():
 
 
 
-    # # Import the function here to avoid circular import
-    # from application.services.database_initial_population_service import seed_all_tables
+    # Import the function here to avoid circular import
+    from database import StartupSeeder
 
-    # # Run the function once initially
-    # seed_all_tables(app)
+    # Run the function once initially, to seed the database
+    table = StartupSeeder(app)
+    table.seed()
 
 
     # Configure logging
