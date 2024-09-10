@@ -32,9 +32,6 @@ class TopicService:
         # Create the topic object
         new_topic = Topic(name=topic, feed_id=feed_id)
 
-        # Add the topic to the database
-        db.session.add(new_topic)
-
         return new_topic
 
 
