@@ -35,6 +35,7 @@ class FeedDataHandler:
         # Validate and parse the response data
         found_topics, not_found_topics = self._validate_and_parse_response_data(news_data)
 
+        # Raise an error if no data is found for the provided topics
         if not found_topics:
             not_found_topics_str = ", ".join(not_found_topics)
             raise ValueError(f"No data found for the provided topics: {not_found_topics_str}. Please insert another topic that exists.")
@@ -42,15 +43,18 @@ class FeedDataHandler:
         # Save the data to the database asynchronously
         feed_model = await asyncio.to_thread(self.feeds_service.insert_feed, self.feed_name, self.is_public)
 
-        print(f"Feed model: {feed_model}, ID = {feed_model.id}")
 
-        # Insert the found topics into the database
-        topics_models = await asyncio.gather(
-            *[asyncio.to_thread(self.topic_service.insert_feed_topic, topic, feed_model.id) for topic in found_topics]
-        )
+        try:
+            # Insert the found topics into the database
+            topics_models = await asyncio.gather(
+                *[asyncio.to_thread(self.topic_service.insert_feed_topic, topic, feed_model.id) for topic in found_topics]
+            )
+
+        except ValueError as e:
+            raise ValueError(f"Error occurred while inserting topics: {str(e)}")
 
         # Commit the transaction after adding all topics
-        await asyncio.to_thread(self._commit_transaction)
+        await asyncio.to_thread(self._commit_transaction, topics_models)
 
         # Insert the feed resources into the database
         resources_models = await asyncio.to_thread(self.resources_service.insert_feed_resources, topics_models, news_data)
@@ -108,7 +112,7 @@ class FeedDataHandler:
                 raise ValueError(f"Invalid payload data: missing {field}")
             elif not isinstance(self.payload[field], field_type):
                 raise ValueError(f"Invalid payload data: {field} must be of type {field_type.__name__}")
-            elif not self.payload[field]:
+            elif field != 'is_public' and not self.payload[field]:
                 raise ValueError(f"Invalid payload data: {field} is empty")
 
         # Validate feed_name length
@@ -119,6 +123,12 @@ class FeedDataHandler:
             raise ValueError("Invalid payload data: feed_name must be at least 3 characters")
 
         # Additional validation for topics
+        
+        # Set global topic length limit
+        MIN_TOPIC_LENGTH = 2
+        MAX_TOPIC_LENGTH = 50
+
+
         topics = self.payload['topics']
         # if is not a list or is an empty list
         if len(topics) > 5:
@@ -126,10 +136,14 @@ class FeedDataHandler:
         for topic in topics:
             if not isinstance(topic, str) or not topic.strip():
                 raise ValueError("Invalid payload data: each topic must be a non-empty string")
-            if len(topic) > 50:
-                raise ValueError("Invalid payload data: topic name must be less than 50 characters")
-            elif len(topic) < 3:
-                raise ValueError("Invalid payload data: topic name must be at least 3 characters")
+            if len(topic) > MAX_TOPIC_LENGTH:
+                raise ValueError(f"Invalid payload data: topic name must be less than {MAX_TOPIC_LENGTH} characters")
+            elif len(topic) < MIN_TOPIC_LENGTH:
+                raise ValueError(f"Invalid payload data: topic name must be at least {MIN_TOPIC_LENGTH} characters")
+
+        # Ensure there are not duplicate topics
+        if len(set(topics)) != len(topics):
+            raise ValueError("Invalid payload data: duplicate topics are not allowed")
 
         # Initialize the attributes
         self.feed_name = feed_name
@@ -163,8 +177,17 @@ class FeedDataHandler:
         return found_topics, not_found_topics
 
 
-    def _commit_transaction(self):
+
+    def _commit_transaction(self, topics_models: list) -> None:
         """
         Commits the current session to the database.
+
+        Args:
+            topics_models (list): List of topic models to be added to the session.
         """
+        # Add all topics to the session
+        for topic in topics_models:
+            db.session.add(topic)
+
+        # Commit the transaction
         db.session.commit()
