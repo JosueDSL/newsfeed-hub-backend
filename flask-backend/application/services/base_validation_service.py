@@ -44,7 +44,7 @@ class BaseValidationService:
             raise ValueError('Username and password are required.')
         elif len(username) < 4 or len(username) > 50:
             raise ValueError('Username must be between 4 and 50 characters long.')
-        elif len(password) < 8 or len(password) > 50:
+        elif len(password) < 6 or len(password) > 50:
             raise ValueError('Password must be between 8 and 50 characters long.')
 
         # Safely convert username and password to strings
