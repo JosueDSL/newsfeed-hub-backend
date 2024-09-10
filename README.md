@@ -203,7 +203,7 @@ The application uses SQLAlchemy for ORM. The primary models include:
 Check out the Entity Relationship Diagram [Entity Relationship Diagram](https://drive.google.com/file/d/146H9AhHwSYPRlHLxqzI5GEOXQ0saj5ge/view?usp=sharing)
 entity_relationship_diagram
 
-![Entity Relationship Diagram](./assets/entity_relationship_diagram.webp)
+![Entity Relationship Diagram](/flask-backend/database/assets/entity_relationship_diagram.webp)
 
 
 ## Project Structure
