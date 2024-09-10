@@ -165,37 +165,37 @@ You will be able to run this project 100% locally.
 The application provides the following API routes:
 
 ---
-User Routes:
+#### User Routes:
 
-POST /user/register: Register a new user.
+- POST `/user/register`: Register a new user.
 
-Auth Routes: 
+#### Auth Routes: 
 
-POST auth/login: Authenticate a user and return a JWT.
-POST auth/logout: Get user profile information.
-GET  auth/protected: Protected route to test auth.
-
----
-Feed Routes:
-
-POST /feeds/create-feed: Create a new feed.
-PUT /feed/<int:feed_id>: Update an existing feed.
-DELETE /feed/<int:feed_id>: Delete a feed.
-DELETE /feed/topic/<int:feed_id>: Delete a topic
+- POST `auth/login`: Authenticate a user and return a JWT.
+- POST `auth/logout`: Get user profile information.
+- GET  `auth/protected`: Protected route to test auth.
 
 ---
-Pagination Routes:
+#### Feed Routes:
 
-GET /feeds/list?page=1&per_page=10: List Private Feeds.
-GET /feeds/list-public?page=1&per_page=10: List Public Feeds with Topic Filter.
-GET /feeds/details/1: List Feed Details.
+- POST   `/feeds/create-feed`: Create a new feed.
+- PUT    `/feed/<int:feed_id>`: Update an existing feed.
+- DELETE `/feed/<int:feed_id>`: Delete a feed.
+- DELETE `/feed/topic/<int:feed_id>`: Delete a topic
+
+---
+#### Pagination Routes:
+
+- GET `/feeds/list?page=1&per_page=10`: List Private Feeds.
+- GET `/feeds/list-public?page=1&per_page=10`: List Public Feeds with Topic Filter.
+- GET `/feeds/details/1`: List Feed Details.
 
 ## Models
 The application uses SQLAlchemy for ORM. The primary models include:
 
 ---
-User: Represents a user in the system.
-Feed: Represents a news feed.
-Topic: Represents a topic within a feed.
-Resource: Represents a news article or resource within a topic.
+- `User`: Represents a user in the system.
+- `Feed`: Represents a news feed.
+- `Topic`: Represents a topic within a feed.
+- `Resource`: Represents a news article or resource within a topic.
 
