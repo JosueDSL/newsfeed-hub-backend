@@ -24,9 +24,12 @@ class TopicService:
         """
         TopicService._validate_topic(topic, feed_id)
 
+        # Set global topic limit
+        TOPIC_LIMIT = 5
+
         # Get the current topics
         current_topics = TopicService.get_topics(feed_id)
-        if len(current_topics) >= 5:
+        if len(current_topics) >= TOPIC_LIMIT:
             raise ValueError('Cannot add more than 5 topics per feed.')
 
         # Create the topic object
@@ -74,6 +77,10 @@ class TopicService:
         Raises: 
             ValueError: If the topic or feed ID is invalid.
         """
+        # Set global topic length limit
+        MIN_TOPIC_LENGTH = 2
+        MAX_TOPIC_LENGTH = 50
+
         # Ensure the feed_id is valid
         if not feed_id or not topic:
             raise ValueError('A topic and feed ID must be provided.')
@@ -89,7 +96,7 @@ class TopicService:
             raise ValueError('Invalid feed ID or topic.')
 
         # Validate topic length
-        if len(topic) > 50:
+        if len(topic) > MAX_TOPIC_LENGTH:
             raise ValueError('Topic name must be less than 50 characters.')
-        elif len(topic) < 3:
-            raise ValueError('Topic name must be at least 3 characters.')
+        elif len(topic) < MIN_TOPIC_LENGTH:
+            raise ValueError('Topic name must be at least 2 characters.')
