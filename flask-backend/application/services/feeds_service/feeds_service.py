@@ -36,3 +36,75 @@ class FeedsService:
         db.session.commit()
 
         return new_feed
+
+
+    @staticmethod
+    def update_feed(feed_id, payload) -> dict:
+        """
+        Update an existing feed in the database.
+
+        Args:
+            feed_id (int): The ID of the feed to update.
+            payload (dict): The payload to update the feed with.
+
+        Returns:
+            Feed: The updated feed object.
+
+        Raises:
+            ValueError: If the feed is not found.
+        """
+        # Ensure payload is provided
+        print(f"Payload: {payload}")
+        if not payload:
+            raise ValueError('Payload is required')
+
+        elif not isinstance(payload, dict):
+            raise ValueError('Payload must be a dictionary')
+
+        # Ensure feed_id is provided and valid
+        if feed_id is None:
+            raise ValueError('Feed ID is required')
+
+        if not isinstance(feed_id, int):
+            raise ValueError('Feed ID must be an integer')
+
+
+        # Get the feed by ID
+        feed = Feed.query.get(feed_id)
+
+        if not feed:
+            raise ValueError('Feed not found')
+        
+        # Ensure the user is the owner of the feed
+        user_id = get_jwt_identity()
+        if feed.user_id != user_id:
+            raise ValueError('Unauthorized to update this feed')
+
+        # Update feed attributes if provided
+        feed_name = payload.get('feed_name')
+        if not isinstance(feed_name, str):
+            raise ValueError('feed_name must be a string')
+
+        is_public = payload.get('is_public')
+        if not isinstance(is_public, bool):
+            raise ValueError('is_public must be a boolean')
+
+        if feed_name:
+            feed.name = feed_name
+        if is_public is not None:
+            feed.is_public = is_public
+
+
+        # Commit changes to the database
+        db.session.commit()
+
+
+        response = {
+            'id': feed.id,
+            'name': feed.name,
+            'is_public': feed.is_public,
+            'topics': [topic.name for topic in feed.topics],
+            'updated_at': feed.updated_at
+        }
+
+        return response
