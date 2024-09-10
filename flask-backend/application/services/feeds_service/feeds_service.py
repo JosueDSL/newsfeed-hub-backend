@@ -104,7 +104,46 @@ class FeedsService:
             'name': feed.name,
             'is_public': feed.is_public,
             'topics': [topic.name for topic in feed.topics],
-            'updated_at': feed.updated_at
+            'updated_at': feed.updated_at,
+            'message': f'Feed {feed_id} updated successfully'
         }
 
         return response
+    
+    @staticmethod
+    def delete_feed(feed_id) -> dict:
+        """
+        Delete an existing feed from the database.
+
+        Args:
+            feed_id (int): The ID of the feed to delete.
+
+        Returns:
+            dict: The response message.
+
+        Raises:
+            ValueError: If the feed is not found.
+        """
+        # Ensure feed_id is provided and valid
+        if feed_id is None:
+            raise ValueError('Feed ID is required')
+
+        if not isinstance(feed_id, int):
+            raise ValueError('Feed ID must be an integer')
+
+        # Get the feed by ID
+        feed = Feed.query.get(feed_id)
+
+        if not feed:
+            raise ValueError('Feed not found')
+
+        # Ensure the user is the owner of the feed
+        user_id = get_jwt_identity()
+        if feed.user_id != user_id:
+            raise ValueError('Unauthorized to delete this feed')
+
+        # Delete the feed from the database
+        db.session.delete(feed)
+        db.session.commit()
+
+        return {'message': f'Feed {int(feed_id)} deleted successfully'}
