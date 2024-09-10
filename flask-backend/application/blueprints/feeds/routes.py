@@ -3,7 +3,7 @@
 from flask import Blueprint, current_app as app, jsonify, request
 from application.blueprints.helper_methods import ErrorHandler
 from flask_jwt_extended import jwt_required, get_jwt_identity
-from application.services import FeedDataHandler, AzureFunctionService, PaginationService
+from application.services import FeedDataHandler, PaginationService, FeedsService, AzureFunctionService
 
 
 # Create a blueprint object
@@ -17,6 +17,13 @@ async def fetch_news_feed_data_endpoint():
 
     """
     An asynchronous endpoint to fetch news feeds data from the Azure Function.
+
+    Args:
+        payload (dict): The payload containing the topics to fetch.
+
+    Returns:
+        JSON: The response from the Azure Function.
+
     """
     
     # Get the payload from the request
@@ -36,9 +43,16 @@ async def fetch_news_feed_data_endpoint():
 @feeds_bp.route('/list', methods=['GET'], endpoint='list_feeds')
 @ErrorHandler.handle_exceptions
 @jwt_required()
-def list_feeds():
+def list_feeds_endpoint():
     """
     List the private feeds of the current user, with pagination and sorting by update/creation date.
+
+    Args:
+        page (int): The page number for pagination.
+        per_page (int): The number of items per page for pagination.
+
+    Returns:
+        JSON: The serialized paginated private feeds.
     """
     current_user_id = get_jwt_identity()
 
@@ -59,10 +73,19 @@ def list_feeds():
 
 @feeds_bp.route('/list-public', methods=['GET'], endpoint='list_public_feeds')
 @ErrorHandler.handle_exceptions
-def list_public_feeds():
+def list_public_feeds_endpoint():
 
     """
     List public feeds with optional topic filter, with pagination and sorting by update/creation date.
+
+    Args:
+        page (int): The page number for pagination.
+        per_page (int): The number of items per page for pagination.
+        topic_filter (str): The topic filter to apply to the feeds.
+
+    Returns:
+        JSON: The serialized paginated
+
     """
     # Get pagination params (default 1st page, 10 items per page)
     page = request.args.get('page', 1, type=int)
@@ -79,12 +102,19 @@ def list_public_feeds():
     return jsonify(paginated_feeds), 200
 
 
-@feeds_bp.route('/feed-details/<int:feed_id>', methods=['GET'], endpoint='feed_details')
+@feeds_bp.route('/details/<int:feed_id>', methods=['GET'], endpoint='feed_details')
 @ErrorHandler.handle_exceptions
-def feed_details(feed_id):
+def feed_details_endpoint(feed_id):
 
     """
     Get details of a specific feed, including its topics and resources (paginated).
+
+    Args:
+        feed_id (int): The ID of the feed to get details for.
+
+    Returns:
+        JSON: The serialized feed details.
+
     """
     # Initialize the pagination service
     pagination_service = PaginationService()
@@ -96,13 +126,44 @@ def feed_details(feed_id):
     return jsonify(feed_details), 200
 
 
+@feeds_bp.route('/<int:feed_id>', methods=['PUT'], endpoint='update_feed')
+@ErrorHandler.handle_exceptions
+@jwt_required()
+def update_feed_endpoint(feed_id):
+    """
+    Update an existing feed in the database.
+
+    Args:
+        feed_id (int): The ID of the feed to update.
+        payload (dict): The payload to update the feed with.
+
+    Returns:
+        JSON: The updated feed object.
+
+    """
+
+    # Get the payload from the request
+    payload = ErrorHandler.get_json_payload()
+
+    # Update the feed using the service method
+    response = FeedsService.update_feed(feed_id, payload)
+
+    return jsonify(response), 200
+
+
 
 @feeds_bp.route('/test-azure-func', methods=['POST'], endpoint='test_azure_func')
 @ErrorHandler.handle_exceptions
 @jwt_required()
-async def test_azure_func():
+async def test_azure_func_endpoint():
     """
     An asynchronous endpoint to test the Azure Function.
+
+    Args:
+        payload (dict): The payload containing the topics to fetch.
+
+    Returns:
+        JSON: The response from the Azure Function.
     """
 
     # Get the payload from the request
