@@ -3,7 +3,7 @@ const axios = require('axios');
 
 app.http('get-news-data', {
     methods: ['POST'],
-    authLevel: 'anonymous',
+    authLevel: 'function',          // Require a function key to access this endpoint, making it private and secure
     handler: async (request, context) => {
         context.log(`Http function processed request for url "${request.url}"`);
 
