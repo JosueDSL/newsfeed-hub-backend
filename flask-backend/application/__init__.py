@@ -92,6 +92,14 @@ def create_app():
                             logging.FileHandler('app.log'),
                             logging.StreamHandler()
                         ])
+    
+    # Set the logging level for httpcore and httpx to WARNING
+    logging.getLogger("httpcore").setLevel(logging.WARNING)
+    logging.getLogger("httpx").setLevel(logging.WARNING)
+    
+    # Set the logging level for asyncio to WARNING
+    logging.getLogger("asyncio").setLevel(logging.WARNING)
+
     app.logger = logging.getLogger(__name__)
 
 
