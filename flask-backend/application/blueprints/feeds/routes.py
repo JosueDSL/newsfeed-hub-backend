@@ -3,11 +3,19 @@
 from flask import Blueprint, current_app as app, jsonify, request
 from application.blueprints.helper_methods import ErrorHandler
 from flask_jwt_extended import jwt_required, get_jwt_identity
+from application.extensions import jwt
 from application.services import FeedDataHandler, PaginationService, FeedsService, AzureFunctionService
 
 
 # Create a blueprint object
 feeds_bp = Blueprint('feeds', __name__, url_prefix='/feeds')
+
+@jwt.expired_token_loader
+def my_expired_token_callback():
+    return jsonify({
+        'status': 401,
+        'message': 'The token has expired'
+    }), 401
 
 
 @feeds_bp.route('/create-feed', methods=['POST'], endpoint='create_feed')

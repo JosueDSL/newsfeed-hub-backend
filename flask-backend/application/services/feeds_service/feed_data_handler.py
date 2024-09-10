@@ -161,6 +161,11 @@ class FeedDataHandler:
         Returns:
             tuple: A tuple containing the list of found topics and the list of not found topics.
         """
+
+        # Check for an error in the response data
+        if 'error' in response_data:
+            raise ValueError(f"Error occurred while fetching data: {response_data['error']}")
+
         found_topics = []
         not_found_topics = []
 

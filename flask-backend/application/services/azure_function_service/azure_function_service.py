@@ -6,7 +6,7 @@
 
 # Import the necessary modules
 import httpx
-
+from httpx import HTTPStatusError
 
 class AzureFunctionService:
     """
@@ -26,12 +26,27 @@ class AzureFunctionService:
             dict: The response from the Azure Function.
         """
 
-        async with httpx.AsyncClient() as client:
-            # Send the list of topics as JSON to the Azure Function
-            response = await client.post(self.function_url, json={"topics": topics})
+        try:
+            async with httpx.AsyncClient() as client:
+                # Send the list of topics as JSON to the Azure Function
+                response = await client.post(self.function_url, json={"topics": topics})
 
-        # Check if the response was successful
-        response.raise_for_status()
+            # Check if the response was successful
+            response.raise_for_status()
 
-        # Return the JSON response
-        return response.json()
+            # Return the JSON response
+            return response.json()
+
+        except HTTPStatusError as e:
+            # Handle specific HTTP errors
+            if e.response.status_code == 401:
+                return {"error": "Unauthorized access. Please check your function key or credentials."}
+            elif e.response.status_code == 404:
+                return {"error": "The requested resource was not found."}
+            else:
+                return {"error": f"HTTP error occurred: {e.response.status_code} - {e.response.text}"}
+
+        except Exception as e:
+            # Handle other possible errors
+            return {"error": f"An error occurred: {str(e)}"}
+        
