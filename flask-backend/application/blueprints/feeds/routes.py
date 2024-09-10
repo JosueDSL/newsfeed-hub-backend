@@ -152,6 +152,27 @@ def update_feed_endpoint(feed_id):
 
 
 
+@feeds_bp.route('/<int:feed_id>', methods=['DELETE'], endpoint='delete_feed')
+@ErrorHandler.handle_exceptions
+@jwt_required()
+def delete_feed_endpoint(feed_id):
+    """
+    Delete an existing feed from the database.
+
+    Args:
+        feed_id (int): The ID of the feed to delete.
+
+    Returns:
+        JSON: A success message.
+    """
+
+    # Delete the feed using the service method
+    response = FeedsService.delete_feed(feed_id)
+
+    return jsonify(response), 200
+
+
+
 @feeds_bp.route('/test-azure-func', methods=['POST'], endpoint='test_azure_func')
 @ErrorHandler.handle_exceptions
 @jwt_required()
