@@ -40,7 +40,7 @@ class AuthService(BaseValidationService):
         # Find the user by username
         user = self.get_user(username)
         if not user:
-            raise ValueError('Invalid username.')
+            raise ValueError('Invalid username, it does not exists.')
         
         # Verify the password
         if not user.verify_password(password):
