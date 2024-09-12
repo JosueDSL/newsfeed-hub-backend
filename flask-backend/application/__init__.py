@@ -2,7 +2,7 @@
 from config import (
     DevelopmentConfig,
     DevelopmentDockerConfig,
-    # ProductionConfig,          # Another config class examples, just for common usage reference:
+    TestingConfig,          # Another config class examples, just for common usage reference:
     # QAConfig
 )
 
@@ -44,7 +44,7 @@ def create_app():
     """
 
     # Load the configuration from the config.py file
-    app.config.from_object(DevelopmentDockerConfig)
+    app.config.from_object(TestingConfig)
     # print(app.config)
 
     # Initialize extensions
