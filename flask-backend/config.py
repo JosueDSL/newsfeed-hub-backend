@@ -55,3 +55,13 @@ class DevelopmentDockerConfig(BaseDevelopmentConfig):
 
     # SQLite database URI set to root level of /app inside the container
     SQLALCHEMY_DATABASE_URI = os.getenv('DEV_DATABASE_DOCKER_URL') or f"sqlite:///{os.path.join(BaseDevelopmentConfig.BASE_DIR, 'newsfeed.db')}"
+
+
+class TestingConfig(Config):
+    TESTING = True
+    SQLALCHEMY_DATABASE_URI = 'sqlite:///:memory:'
+    JWT_TOKEN_LOCATION = ['headers']
+    WTF_CSRF_ENABLED = False
+    JWT_COOKIE_SECURE = False
+    JWT_COOKIE_SAMESITE = 'Lax'
+    JWT_COOKIE_CSRF_PROTECT = False
